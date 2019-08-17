@@ -1,0 +1,40 @@
+{
+  "name": "is-localhost-ip",
+  "version": "1.0.0",
+  "description": "Checks whether given DNS name or IPv4/IPv6 address belongs to local machine",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "test": "jest --coverage --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinovyatkin/is-localhost-ip.git"
+  },
+  "keywords": [
+    "localhost",
+    "is-localhost",
+    "check-localhost",
+    "is-loopback",
+    "is-local-ip",
+    "ip",
+    "dns"
+  ],
+  "author": "Konstantin Vyatkin <tino@vtkn.io>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/tinovyatkin/is-localhost-ip/issues"
+  },
+  "homepage": "https://github.com/tinovyatkin/is-localhost-ip#readme",
+  "devDependencies": {
+    "@types/jest": "24.0.17",
+    "@types/node": "12.7.2",
+    "eslint": "6.1.0",
+    "jest": "24.9.0"
+  }
+}

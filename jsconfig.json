@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "lib": ["esnext"],
+    "strict": true,
+    "allowUnreachableCode": false,
+    "noUnusedLocals": true
+  }
+}
