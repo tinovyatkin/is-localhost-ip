@@ -1,13 +1,13 @@
 'use strict';
 
 const { isIP } = require('net');
-const { lookup } = require('dns').promises;
+const { lookup } = require('dns');
 const { networkInterfaces } = require('os');
 
 const INTERFACES_ADDRESSES = new Set(
-  Object.values(networkInterfaces()).flatMap(arr =>
-    arr.map(({ address }) => address)
-  )
+  Object.values(networkInterfaces()).reduce((arr, networkInterface) =>
+    arr.concat(networkInterface.map(({ address }) => address))
+  , [])
 );
 
 const IP_RANGES = [
@@ -47,19 +47,22 @@ async function isLocalhost(ip) {
   }
 
   // it's a DNS name
-  try {
-    const addresses = await lookup(ip, { all: true });
-    return (
-      Array.isArray(addresses) &&
-      addresses.some(
-        ({ address }) =>
-          IP_RANGES.some(it => it.test(address)) ||
-          INTERFACES_ADDRESSES.has(address)
-      )
-    );
-  } catch (err) {
-    return false;
-  }
+  return new Promise((resolve) => {
+    lookup(ip, { all: true }, (error, addresses) => {
+      if (error) {
+        return resolve(false);
+      }
+      const isLocalhost = (
+        Array.isArray(addresses) &&
+        addresses.some(
+          ({address}) =>
+            IP_RANGES.some(it => it.test(address)) ||
+            INTERFACES_ADDRESSES.has(address)
+        )
+      );
+      resolve(isLocalhost);
+    });
+  });
 }
 
 module.exports = isLocalhost;

@@ -4,7 +4,7 @@ Comprehensively checks whether given DNS name or IPv4/IPv6 address belongs to lo
 
 Main difference from other libraries here is comprehensiveness: we start from simple RegExp checks, then fallbacks DNS resolver (so it works with something like `john.dev` remapped locally).
 
-Requires Node 12+, 100% code coverage
+Requires Node 10+, 100% code coverage
 
 ## Installation
 
