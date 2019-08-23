@@ -20,14 +20,14 @@ const isLocalhost = require('is-localhost-ip');
 
 (async () => {
 
-    await isLocal("127.0.0.1"); // true
-    await isLocal("::ffff:127.0.0.1"); // true
-    await isLocal("192.168.0.12"); // true
-    await isLocal("184.55.123.2"); // false
+    await isLocalhost("127.0.0.1"); // true
+    await isLocalhost("::ffff:127.0.0.1"); // true
+    await isLocalhost("192.168.0.12"); // true
+    await isLocalhost("184.55.123.2"); // false
 
-    await isLocal("tino.local"); // true
-    await isLocal("localhost"); // true
-    await isLocal("microsoft.com"); // false
+    await isLocalhost("tino.local"); // true
+    await isLocalhost("localhost"); // true
+    await isLocalhost("microsoft.com"); // false
 
 })();
 
