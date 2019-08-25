@@ -24,6 +24,9 @@ describe('Host names', () => {
   it('works with `localhost`', async () =>
     expect(await isLocal('localhost')).toBeTruthy());
 
-  it('work with some bad names', async () =>
+  it('works with `google.com`', async () =>
+    expect(await isLocal('google.com')).toBeFalsy());
+
+  it('works with some bad names', async () =>
     expect(await isLocal('definitely123.not.a.good.domain.name')).toBeFalsy());
 });
