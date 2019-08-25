@@ -1,14 +1,46 @@
 'use strict';
 
 const { isIP } = require('net');
-const { lookup } = require('dns');
 const { networkInterfaces } = require('os');
 
-const INTERFACES_ADDRESSES = new Set(
-  Object.values(networkInterfaces()).reduce((arr, networkInterface) =>
-    arr.concat(networkInterface.map(({ address }) => address))
-  , [])
-);
+const LOCAL_INTERFACES = networkInterfaces();
+const INTERFACES_ADDRESSES = /** @type {Set<string>} */ (new Set());
+
+// We will check if every network interface has an IPv4 or IPv6 address
+// to try to avoid lookup both families
+let haveIPv4 = 0;
+let haveIPv6 = 0;
+for (const interfaceInfo of Object.values(LOCAL_INTERFACES)) {
+  for (const { address, family } of interfaceInfo) {
+    INTERFACES_ADDRESSES.add(address);
+    switch (family) {
+      case 'IPv4':
+        haveIPv4++;
+        break;
+
+      case 'IPv6':
+        haveIPv6++;
+        break;
+    }
+  }
+}
+
+const totalInterfaces = Object.keys(LOCAL_INTERFACES).length;
+const LOOKUP_OPTIONS = /** @type {import('dns').LookupAllOptions} */ ({
+  all: true,
+  family:
+    totalInterfaces === haveIPv4 ? 4 : totalInterfaces === haveIPv6 ? 6 : 0,
+});
+
+/**
+ * DNS.promises were experimental until Node 11.4 and we don't want experimental warning
+ * https://nodejs.org/en/blog/release/v11.14.0/
+ */
+const lookup =
+  process.version >= 'v11.4'
+    ? // eslint-disable-next-line node/no-unsupported-features/node-builtins
+      require('dns').promises.lookup
+    : require('util').promisify(require('dns').lookup);
 
 const IP_RANGES = [
   // 10.0.0.0 - 10.255.255.255
@@ -24,7 +56,7 @@ const IP_RANGES = [
   // fc00::/7
   /^f[c-d][0-9a-f]{2}(::1$|:[0-9a-f]{1,4}){1,7}$/,
   // fe80::/10
-  /^fe[89ab][0-9a-f](::1$|:[0-9a-f]{1,4}){1,7}$/
+  /^fe[89ab][0-9a-f](::1$|:[0-9a-f]{1,4}){1,7}$/,
 ];
 
 /**
@@ -47,22 +79,19 @@ async function isLocalhost(ip) {
   }
 
   // it's a DNS name
-  return new Promise((resolve) => {
-    lookup(ip, { all: true }, (error, addresses) => {
-      if (error) {
-        return resolve(false);
-      }
-      const isLocalhost = (
-        Array.isArray(addresses) &&
-        addresses.some(
-          ({address}) =>
-            IP_RANGES.some(it => it.test(address)) ||
-            INTERFACES_ADDRESSES.has(address)
-        )
-      );
-      resolve(isLocalhost);
-    });
-  });
+  try {
+    const addresses = await lookup(ip, LOOKUP_OPTIONS);
+    return (
+      Array.isArray(addresses) &&
+      addresses.some(
+        ({ address }) =>
+          IP_RANGES.some(it => it.test(address)) ||
+          INTERFACES_ADDRESSES.has(address),
+      )
+    );
+  } catch (_) {
+    return false;
+  }
 }
 
 module.exports = isLocalhost;

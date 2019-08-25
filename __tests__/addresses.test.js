@@ -4,6 +4,8 @@
 const isLocal = require('../index');
 
 describe('IP addresses', () => {
+  // throw on process warnings
+
   it('edge case - 0', async () => expect(await isLocal(0)).toBeFalsy());
   it('edge case - NaN', async () => expect(await isLocal(NaN)).toBeFalsy());
   it('works for ::', async () => expect(await isLocal('::1')).toBeTruthy());
@@ -22,7 +24,7 @@ describe('IP addresses', () => {
     expect(await isLocal('fe80::1')).toBeTruthy();
     expect(await isLocal('febf::1')).toBeTruthy();
     expect(
-      await isLocal('fe80:0000:0000:0000:0000:0000:0000:0000')
+      await isLocal('fe80:0000:0000:0000:0000:0000:0000:0000'),
     ).toBeTruthy();
     expect(await isLocal('ff00::1')).toBeFalsy();
   });
@@ -80,7 +82,7 @@ describe('IP addresses', () => {
     expect(await isLocal('fc00::1')).toBeTruthy();
     expect(await isLocal('fdff::1')).toBeTruthy();
     expect(
-      await isLocal('fdaa:0000:0000:0000:0000:0000:0000:0000')
+      await isLocal('fdaa:0000:0000:0000:0000:0000:0000:0000'),
     ).toBeTruthy();
     expect(await isLocal('fe00::1')).toBeFalsy();
   });
