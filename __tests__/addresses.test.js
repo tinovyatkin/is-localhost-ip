@@ -13,6 +13,9 @@ describe('IP addresses', () => {
   it('works for fe80::1', async () =>
     expect(await isLocal('fe80::1')).toBeTruthy());
 
+  it('works for 1.1.1.1 by cloudflare', async () =>
+    expect(await isLocal('1.1.1.1')).toBeFalsy());
+
   it('works for all 127.x.0.1', async () => {
     for (let i = 0; i <= 255; ++i) {
       expect(await isLocal(`127.${i}.0.1`)).toBeTruthy();
