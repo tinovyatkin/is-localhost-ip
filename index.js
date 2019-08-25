@@ -8,7 +8,10 @@ const { networkInterfaces } = require('os');
   https://nodejs.org/en/blog/release/v11.14.0/
 */
 const lookup =
-  process.version >= 'v11.4'
+  process.versions.node
+    .split('.', 2)
+    .map(n => n.padStart(2, '0'))
+    .join('.') >= '11.04'
     ? // eslint-disable-next-line node/no-unsupported-features/node-builtins
       require('dns').promises.lookup
     : require('util').promisify(require('dns').lookup);
