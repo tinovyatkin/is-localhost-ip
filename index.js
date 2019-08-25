@@ -62,6 +62,13 @@ const IP_RANGES = [
 ];
 
 /**
+ * Syntax validation RegExp for possible valid host names. Permits underscore.
+ * Maximum total length 253 symbols, maximum segment length 63 symbols
+ * @see {@link https://en.wikipedia.org/wiki/Hostname}
+ */
+const VALID_HOSTNAME = /(?![a-z0-9-_]{64,})((^(?=[-a-z0-9._]{1,253}\.?$)(([a-z0-9_]{1,63}|([a-z0-9_][a-z0-9-_]{0,61}[a-z0-9_]))\.?)+$)(?<!\.{2,}))/i;
+
+/**
  * Checks if given strings is a local IP address or a DNS name that resolve into a local IP
  *
  * @param {string} ip
@@ -80,6 +87,9 @@ async function isLocalhost(ip) {
     );
   }
 
+  // May it be a hostname?
+  if (!VALID_HOSTNAME.test(ip)) return false;
+
   // it's a DNS name
   try {
     const addresses = await lookup(ip, LOOKUP_OPTIONS);
@@ -97,3 +107,4 @@ async function isLocalhost(ip) {
 }
 
 module.exports = isLocalhost;
+module.exports.VALID_HOSTNAME = VALID_HOSTNAME; // for tests
