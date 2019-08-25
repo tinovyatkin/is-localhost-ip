@@ -4,8 +4,11 @@
   "description": "Checks whether given DNS name or IPv4/IPv6 address belongs to local machine",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts",
+    "index.js.flow"
   ],
+  "types": "index.d.ts",
   "engines": {
     "node": ">=10"
   },
