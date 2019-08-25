@@ -3,26 +3,35 @@
 const { isIP } = require('net');
 const { networkInterfaces } = require('os');
 
+/*
+  DNS.promises were experimental until Node 11.4 and we don't want experimental warning
+  https://nodejs.org/en/blog/release/v11.14.0/
+*/
+const lookup =
+  process.version >= 'v11.4'
+    ? // eslint-disable-next-line node/no-unsupported-features/node-builtins
+      require('dns').promises.lookup
+    : require('util').promisify(require('dns').lookup);
+
 const LOCAL_INTERFACES = networkInterfaces();
 const INTERFACES_ADDRESSES = /** @type {Set<string>} */ (new Set());
 
-// We will check if every network interface has an IPv4 or IPv6 address
-// to try to avoid lookup both families
+/*
+ We will check if every network interface has an IPv4 or IPv6 address
+ to try to avoid lookup both families
+*/
 let haveIPv4 = 0;
 let haveIPv6 = 0;
 for (const interfaceInfo of Object.values(LOCAL_INTERFACES)) {
+  let v4 = false;
+  let v6 = false;
   for (const { address, family } of interfaceInfo) {
     INTERFACES_ADDRESSES.add(address);
-    switch (family) {
-      case 'IPv4':
-        haveIPv4++;
-        break;
-
-      case 'IPv6':
-        haveIPv6++;
-        break;
-    }
+    if (family === 'IPv4') v4 = true;
+    else v6 = true;
   }
+  if (v4) haveIPv4++;
+  if (v6) haveIPv6++;
 }
 
 const totalInterfaces = Object.keys(LOCAL_INTERFACES).length;
@@ -31,16 +40,6 @@ const LOOKUP_OPTIONS = /** @type {import('dns').LookupAllOptions} */ ({
   family:
     totalInterfaces === haveIPv4 ? 4 : totalInterfaces === haveIPv6 ? 6 : 0,
 });
-
-/**
- * DNS.promises were experimental until Node 11.4 and we don't want experimental warning
- * https://nodejs.org/en/blog/release/v11.14.0/
- */
-const lookup =
-  process.version >= 'v11.4'
-    ? // eslint-disable-next-line node/no-unsupported-features/node-builtins
-      require('dns').promises.lookup
-    : require('util').promisify(require('dns').lookup);
 
 const IP_RANGES = [
   // 10.0.0.0 - 10.255.255.255
