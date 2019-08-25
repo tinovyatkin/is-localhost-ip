@@ -1,15 +1,17 @@
+[![codecov](https://codecov.io/gh/tinovyatkin/is-localhost-ip/branch/master/graph/badge.svg)](https://codecov.io/gh/tinovyatkin/is-localhost-ip) ![node](https://img.shields.io/node/v/is-localhost-ip)
+
 # is-localhost-ip
 
 Comprehensively checks whether given DNS name or IPv4/IPv6 address belongs to local machine
 
-Main difference from other libraries here is comprehensiveness: we start from simple RegExp checks, then fallbacks DNS resolver (so it works with something like `john.dev` remapped locally).
+Main difference from other libraries here is comprehensiveness: we start from simple RegExp checks, then fallback to DNS resolver (so it works with something like `john.dev` remapped locally).
 
-Requires Node 10+, 100% code coverage
 
 ## Installation
 
 ```sh
 npm i is-localhost-ip
+# or
 yarn add is-localhost-ip
 ```
 
