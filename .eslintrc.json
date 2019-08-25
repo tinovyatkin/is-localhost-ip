@@ -4,13 +4,10 @@
     "es6": true,
     "node": true
   },
-  "extends": ["eslint:recommended"],
-  "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
-  },
+  "extends": ["eslint:recommended", "plugin:node/recommended"],
   "parserOptions": {
-    "ecmaVersion": 2019
+    "ecmaVersion": 2019,
+    "sourceType": "script"
   },
   "overrides": [
     {

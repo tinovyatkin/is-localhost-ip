@@ -3,35 +3,30 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-trigger:
-- master
+jobs:
+  - job: LinuxNode12
+    pool:
+     vmImage: 'Ubuntu-latest'
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "12.x"
+        displayName: "Install Node.js 12.x"
+      - template: azure-pipelines-steps.yml
 
-pool:
-  vmImage: 'ubuntu-latest'
+  - job: WindowsNode10
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - script: |
+          git config --global core.autocrlf false
+          git config --global core.symlinks true
+        displayName: 'Preserve LF endings and symbolic links on check out'
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "10.x"
+        displayName: "Install Node.js 10.x"
+      - template: azure-pipelines-steps.yml
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.x'
-  displayName: 'Install Node.js'
 
-- script: npm ci
-  displayName: 'npm install'
 
-- script: node --expose-gc node_modules/jest/bin/jest --forceExit --logHeapUsage --runInBand --ci --reporters=default --reporters=jest-junit
-  displayName: "Run Jest"
-
-- script: npx codecov -f "./coverage/coverage-final.json" -y "./.codecov.yml" -t $(CODECOV_TOKEN)
-  displayName: "Upload to Codecov"
-
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: "**/junit.xml"
-
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/cobertura-coverage.xml"
-    reportDirectory: "$(System.DefaultWorkingDirectory)/**/coverage"

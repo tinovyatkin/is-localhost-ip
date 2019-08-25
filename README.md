@@ -1,15 +1,19 @@
+[![codecov](https://codecov.io/gh/tinovyatkin/is-localhost-ip/branch/master/graph/badge.svg)](https://codecov.io/gh/tinovyatkin/is-localhost-ip) ![node](https://img.shields.io/node/v/is-localhost-ip)
+
 # is-localhost-ip
 
-Comprehensively checks whether given DNS name or IPv4/IPv6 address belongs to local machine
+Comprehensive and robust library to checks whether given host name or IPv4/IPv6 address belongs to the local machine
 
-Main difference from other libraries here is comprehensiveness: we start from simple RegExp checks, then fallbacks DNS resolver (so it works with something like `john.dev` remapped locally).
+Main difference from other libraries here is comprehensiveness: we start from strict RegExp checks (for IP address first, and then for correctness to be a host name), then fallback to DNS resolver (so it works with something like `john.dev` remapped locally in `hosts` or with local resolver).
 
-Requires Node 10+, 100% code coverage
+All this in just _~100 lines of code_ without external dependencies.
+
 
 ## Installation
 
 ```sh
 npm i is-localhost-ip
+# or
 yarn add is-localhost-ip
 ```
 
@@ -32,3 +36,21 @@ const isLocalhost = require('is-localhost-ip');
 })();
 
 ```
+
+## Caveats
+
+Doesn't work with internationalized ([RFC 3492](https://tools.ietf.org/html/rfc3492) or [RFC 5891](https://tools.ietf.org/html/rfc5891)) domain names. If you need that please use wonderful [Punycode.js](https://github.com/bestiejs/punycode.js) to convert the string before passing to this library:
+
+```js
+const isLocalhost = require('is-localhost-ip');
+const punycode = require('punycode');
+
+(async () => {
+    await isLocalhost(punycode.toASCII("кремль.рф")); // false
+    await isLocalhost(punycode.toASCII("私の.家")); // true
+})();
+```
+
+## License
+
+`is-localhost-ip` is available under the [MIT](https://mths.be/mit) license.
