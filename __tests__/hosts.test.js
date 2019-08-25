@@ -1,8 +1,8 @@
 'use strict';
 
-const isLocal = require('../index');
-
 describe('Host names', () => {
+  /** @type {import('../index')} */
+  let isLocal;
   beforeAll(() => {
     process.on('unhandledRejection', up => {
       throw up;
@@ -10,6 +10,8 @@ describe('Host names', () => {
     process.once('warning', e => {
       throw e;
     });
+    // load like here to catch any experimental warning
+    isLocal = require('../index');
   });
   afterAll(() => {
     process.removeAllListeners('warning');
