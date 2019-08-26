@@ -9,6 +9,8 @@
     "ecmaVersion": 2019,
     "sourceType": "script"
   },
+  "plugins": ["optimize-regex"],
+  "rules": { "optimize-regex/optimize-regex": "error" },
   "overrides": [
     {
       "files": ["**/__tests__/*.js", "*.test.js"],
