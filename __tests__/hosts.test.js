@@ -27,6 +27,9 @@ describe('Host names', () => {
   it('works with `google.com`', async () =>
     expect(await isLocal('google.com')).toBeFalsy());
 
-  it('works with some bad names', async () =>
+  it('works with some syntactically correct, but non-existent names', async () =>
     expect(await isLocal('definitely123.not.a.good.domain.name')).toBeFalsy());
+
+  it('works with some syntactically incorrect names', async () =>
+    expect(await isLocal('_a.not..domain.name')).toBeFalsy());
 });

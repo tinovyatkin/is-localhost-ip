@@ -17,7 +17,10 @@ const lookup =
     : require('util').promisify(require('dns').lookup);
 
 const LOCAL_INTERFACES = networkInterfaces();
-const INTERFACES_ADDRESSES = /** @type {Set<string>} */ (new Set());
+const INTERFACES_ADDRESSES = /** @type {Set<string>} */ (new Set([
+  '::',
+  '::1',
+]));
 
 /*
  We will check if every network interface has an IPv4 or IPv6 address
@@ -44,29 +47,38 @@ const LOOKUP_OPTIONS = /** @type {import('dns').LookupAllOptions} */ ({
     totalInterfaces === haveIPv4 ? 4 : totalInterfaces === haveIPv6 ? 6 : 0,
 });
 
+/**
+ * Addresses reserved for private networks
+ * @see {@link https://en.wikipedia.org/wiki/Private_network}
+ */
 const IP_RANGES = [
   // 10.0.0.0 - 10.255.255.255
-  /^(::f{4}:)?10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,
+  /^(:{2}f{4}:)?10(?:\.\d{1,3}){3}$/,
   // 127.0.0.0 - 127.255.255.255
-  /^(::f{4}:)?127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,
+  /^(:{2}f{4}:)?127(?:\.\d{1,3}){3}$/,
   // 169.254.1.0 - 169.254.254.255
   /^(::f{4}:)?169\.254\.([1-9]|1?\d\d|2[0-4]\d|25[0-4])\.\d{1,3}$/,
   // 172.16.0.0 - 172.31.255.255
-  /^(::f{4}:)?(172\.1[6-9]|172\.2\d|172\.3[0-1])\.\d{1,3}\.\d{1,3}$/,
+  /^(:{2}f{4}:)?(172\.1[6-9]|172\.2\d|172\.3[01])(?:\.\d{1,3}){2}$/,
   // 192.168.0.0 - 192.168.255.255
-  /^(::f{4}:)?192\.168\.\d{1,3}\.\d{1,3}$/,
+  /^(:{2}f{4}:)?192\.168(?:\.\d{1,3}){2}$/,
   // fc00::/7
-  /^f[c-d][0-9a-f]{2}(::1$|:[0-9a-f]{1,4}){1,7}$/,
+  /^f[cd][\da-f]{2}(::1$|:[\da-f]{1,4}){1,7}$/,
   // fe80::/10
-  /^fe[89ab][0-9a-f](::1$|:[0-9a-f]{1,4}){1,7}$/,
+  /^fe[89ab][\da-f](::1$|:[\da-f]{1,4}){1,7}$/,
 ];
+
+// Concat all RegExes from above into one
+const IP_TESTER_RE = new RegExp(
+  `^(${IP_RANGES.map(re => re.source).join('|')})$`,
+);
 
 /**
  * Syntax validation RegExp for possible valid host names. Permits underscore.
  * Maximum total length 253 symbols, maximum segment length 63 symbols
  * @see {@link https://en.wikipedia.org/wiki/Hostname}
  */
-const VALID_HOSTNAME = /(?![a-z0-9-_]{64,})((^(?=[-a-z0-9._]{1,253}\.?$)(([a-z0-9_]{1,63}|([a-z0-9_][a-z0-9-_]{0,61}[a-z0-9_]))\.?)+$)(?<!\.{2,}))/i;
+const VALID_HOSTNAME = /(?![\w-]{64,})((^(?=[\w-.]{1,253}\.?$)((\w{1,63}|(\w[\w-]{0,61}\w))\.?)+$)(?<!\.{2,}))/i;
 
 /**
  * Checks if given strings is a local IP address or a DNS name that resolve into a local IP
@@ -78,14 +90,7 @@ async function isLocalhost(ip) {
   if (typeof ip !== 'string') return false;
 
   // Check if given string is an IP address
-  if (isIP(ip)) {
-    return (
-      ip === '::' ||
-      ip === '::1' ||
-      IP_RANGES.some(it => it.test(ip)) ||
-      INTERFACES_ADDRESSES.has(ip)
-    );
-  }
+  if (isIP(ip)) return INTERFACES_ADDRESSES.has(ip) || IP_TESTER_RE.test(ip);
 
   // May it be a hostname?
   if (!VALID_HOSTNAME.test(ip)) return false;
@@ -97,8 +102,7 @@ async function isLocalhost(ip) {
       Array.isArray(addresses) &&
       addresses.some(
         ({ address }) =>
-          IP_RANGES.some(it => it.test(address)) ||
-          INTERFACES_ADDRESSES.has(address),
+          INTERFACES_ADDRESSES.has(address) || IP_TESTER_RE.test(address),
       )
     );
   } catch (_) {
