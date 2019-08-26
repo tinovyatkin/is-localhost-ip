@@ -13,7 +13,7 @@
   "rules": { "optimize-regex/optimize-regex": "error" },
   "overrides": [
     {
-      "files": ["**/__tests__/*.js", "*.test.js"],
+      "files": ["**/__tests__/*.js", "*.test.js", "**/__mocks__/*.js"],
       "env": {
         "jest": true
       },
