@@ -62,8 +62,8 @@ if (
   };
 } else {
   dns.promises = {
-    async lookup() {
-      throw new Error(`Should not call dns.promises on Node < 11.14`);
+    get lookup() {
+      throw new Error(`Should not even touch dns.promises on Node < 11.14`);
     },
   };
   dns.lookup =
@@ -76,7 +76,7 @@ if (
       expect(options).toBeDefined();
       expect([0, 4, 6]).toContain(options.family);
       expect(options.all).toBeTruthy();
-      expect(callback).toBeInstanceOf(Function);
+      expect(typeof callback).toBe('function');
       lookup(hostname, callback);
     };
 }
