@@ -37,7 +37,7 @@
   "devDependencies": {
     "@types/jest": "24.0.18",
     "@types/node": "12.7.5",
-    "eslint": "6.3.0",
+    "eslint": "6.4.0",
     "eslint-plugin-node": "10.0.0",
     "eslint-plugin-optimize-regex": "1.1.6",
     "jest": "24.9.0",
