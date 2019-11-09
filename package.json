@@ -42,7 +42,7 @@
     "eslint-plugin-optimize-regex": "1.1.7",
     "jest": "24.9.0",
     "jest-junit": "9.0.0",
-    "prettier": "1.19.0"
+    "prettier": "1.19.1"
   },
   "jest": {
     "coverageReporters": [
