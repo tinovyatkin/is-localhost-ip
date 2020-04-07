@@ -1,6 +1,6 @@
 {
   "name": "is-localhost-ip",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Checks whether given DNS name or IPv4/IPv6 address belongs to a local machine",
   "main": "index.js",
   "files": [
