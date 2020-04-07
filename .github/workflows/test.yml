@@ -43,18 +43,10 @@ jobs:
 
       - run: node --throw-deprecation --trace-warnings --expose-gc node_modules/jest/bin/jest --forceExit --colors --logHeapUsage --runInBand --ci --detectOpenHandles --detectLeaks --coverage
 
-      - name: Upload coverage to Codecov (EXE)
-        if: matrix.os == 'windows-latest'
-        # https://github.com/codecov/codecov-exe/blob/master/Source/Codecov/Program/CommandLineOptions.cs
-        run: |
-          choco install codecov -y --no-progress
-          codecov.exe -f "./coverage/coverage-final.json" -t ${{secrets.CODECOV_TOKEN}} --branch ${{ github.head_ref }} --pr ${{ github.event.number }} --build ${{ github.run_id }}
-
-      - name: Upload client coverage to Codecov (Bash)
-        if: matrix.os != 'windows-latest'
-        # https://github.com/codecov/codecov-bash/blob/1044b7a243e0ea0c05ed43c2acd8b7bb7cef340c/codecov#L158
-        run: bash <(curl -s https://codecov.io/bash)
-          -f ./coverage/coverage-final.json
-          -Z || echo 'Codecov upload failed'
-        env:
-          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+      - name: Upload coverage to Codecov  
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/coverage-final.json
+          name: ${{ matrix.os }}
+          fail_ci_if_error: true
