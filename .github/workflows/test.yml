@@ -49,6 +49,8 @@ jobs:
         run: |
           choco install codecov
           codecov.exe -f "./coverage/coverage-final.json" -t ${{secrets.CODECOV_TOKEN}}
+        env:
+          GITHUB_ACTIONS: True
 
       - name: Upload client coverage to Codecov (Bash)
         if: matrix.os != 'windows-latest'
