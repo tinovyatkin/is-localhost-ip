@@ -4,10 +4,10 @@ describe('Host names', () => {
   /** @type {import('../index')} */
   let isLocal;
   beforeAll(() => {
-    process.on('unhandledRejection', up => {
+    process.on('unhandledRejection', (up) => {
       throw up;
     });
-    process.once('warning', e => {
+    process.once('warning', (e) => {
       throw e;
     });
     // load like here to catch any experimental warning

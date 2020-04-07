@@ -36,7 +36,7 @@ function lookup(hostname, callback) {
 if (
   process.versions.node
     .split('.', 2)
-    .map(n => n.padStart(2, '0'))
+    .map((n) => n.padStart(2, '0'))
     .join('.') >= '11.14'
 ) {
   dns.lookup = () => {

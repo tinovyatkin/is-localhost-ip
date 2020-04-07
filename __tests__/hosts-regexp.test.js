@@ -26,8 +26,8 @@ describe('hostnames validation via RegExp', () => {
       Array.from({ length: 63 }, () =>
         String.fromCodePoint(65 + Math.floor(25 * Math.random())),
       ).join('') + '.',
-    ].map(v => [v]),
-  )('%s should be valid', i => expect(i).toMatch(VALID_HOSTNAME));
+    ].map((v) => [v]),
+  )('%s should be valid', (i) => expect(i).toMatch(VALID_HOSTNAME));
 
   test.each(
     [
@@ -55,6 +55,6 @@ describe('hostnames validation via RegExp', () => {
           String.fromCodePoint(65 + Math.floor(25 * Math.random())),
         ).join(''),
       ).join('.'),
-    ].map(v => [v]),
-  )('%s should be invalid', i => expect(i).not.toMatch(VALID_HOSTNAME));
+    ].map((v) => [v]),
+  )('%s should be invalid', (i) => expect(i).not.toMatch(VALID_HOSTNAME));
 });
