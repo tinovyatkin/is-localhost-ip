@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - 'index.js'
+      - 'package-lock.json'
+      - '.github/workflows/test.yml'
+
+jobs:
+  test:
+    name: Test
+    env:
+      CI: true
+      HUSKY_SKIP_INSTALL: true
+      FORCE_COLOR: 2
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        node: [13.x, 12.x, 10.x]
+        exclude:
+          # On Windows, run tests with only the LTS environments.
+          - os: windows-latest
+            node: 10.x
+          - os: windows-latest
+            node: 13.x
+          # On macOS, run tests with only the LTS environments.
+          - os: macOS-latest
+            node: 10.x
+          - os: macOS-latest
+            node: 13.x
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: npm ci
+
+      - run: node —-throw-deprecation --trace-warnings --expose-gc node_modules/jest/bin/jest --forceExit --colors --logHeapUsage --runInBand --ci --detectOpenHandles --detectLeaks --coverage
+
+      - name: Upload coverage to Codecov
+        # https://github.com/codecov/codecov-bash/blob/1044b7a243e0ea0c05ed43c2acd8b7bb7cef340c/codecov#L158
+        run: npx codecov -f "./coverage/coverage-final.json"
+        env:
+          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
