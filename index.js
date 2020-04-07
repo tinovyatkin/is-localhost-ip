@@ -96,7 +96,7 @@ async function isLocalhost(ipOrHostname, canBind = false) {
       all: true,
       family: 0,
       verbatim: true,
-      hints: ADDRCONFIG,
+      hints: canBind ? ADDRCONFIG : undefined,
     });
     if (!Array.isArray(addresses)) return false;
     for (const { address } of addresses) {
