@@ -13,7 +13,8 @@
     "node": ">=10"
   },
   "scripts": {
-    "test": "jest --coverage --verbose"
+    "test": "jest --coverage --verbose",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
