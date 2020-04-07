@@ -1,55 +1,26 @@
 'use strict';
 
-const { isIP } = require('net');
-const { networkInterfaces } = require('os');
+const { isIP, isIPv4 } = require('net');
+const { createSocket } = require('dgram');
+const { ADDRCONFIG } = require('dns');
 
 /*
-  DNS.promises were experimental until Node 11.4 and we don't want experimental warning
-  https://nodejs.org/en/blog/release/v11.14.0/
+DNS.promises were experimental until Node 11.4 and we don't want experimental warning
+https://nodejs.org/en/blog/release/v11.14.0/
 */
 const lookup =
   process.versions.node
     .split('.', 2)
-    .map(n => n.padStart(2, '0'))
+    .map((n) => n.padStart(2, '0'))
     .join('.') >= '11.14'
     ? // eslint-disable-next-line node/no-unsupported-features/node-builtins
       require('dns').promises.lookup
     : require('util').promisify(require('dns').lookup);
 
-const LOCAL_INTERFACES = networkInterfaces();
-const INTERFACES_ADDRESSES = /** @type {Set<string>} */ (new Set([
-  '::',
-  '::1',
-]));
-
-/*
- We will check if every network interface has an IPv4 or IPv6 address
- to try to avoid lookup both families
-*/
-let haveIPv4 = 0;
-let haveIPv6 = 0;
-for (const interfaceInfo of Object.values(LOCAL_INTERFACES)) {
-  let v4 = false;
-  let v6 = false;
-  for (const { address, family } of interfaceInfo) {
-    INTERFACES_ADDRESSES.add(address);
-    if (family === 'IPv4') v4 = true;
-    else v6 = true;
-  }
-  if (v4) haveIPv4++;
-  if (v6) haveIPv6++;
-}
-
-const totalInterfaces = Object.keys(LOCAL_INTERFACES).length;
-const LOOKUP_OPTIONS = /** @type {import('dns').LookupAllOptions} */ ({
-  all: true,
-  family:
-    totalInterfaces === haveIPv4 ? 4 : totalInterfaces === haveIPv6 ? 6 : 0,
-});
-
 /**
  * Addresses reserved for private networks
  * @see {@link https://en.wikipedia.org/wiki/Private_network}
+ * @see {@link https://en.wikipedia.org/wiki/Unique_local_address}
  */
 const IP_RANGES = [
   // 10.0.0.0 - 10.255.255.255
@@ -70,7 +41,7 @@ const IP_RANGES = [
 
 // Concat all RegExes from above into one
 const IP_TESTER_RE = new RegExp(
-  `^(${IP_RANGES.map(re => re.source).join('|')})$`,
+  `^(${IP_RANGES.map((re) => re.source).join('|')})$`,
 );
 
 /**
@@ -81,33 +52,59 @@ const IP_TESTER_RE = new RegExp(
 const VALID_HOSTNAME = /(?![\w-]{64,})((^(?=[\w-.]{1,253}\.?$)((\w{1,63}|(\w[\w-]{0,61}\w))\.?)+$)(?<!\.{2,}))/i;
 
 /**
- * Checks if given strings is a local IP address or a DNS name that resolve into a local IP
  *
  * @param {string} ip
+ * @returns {Promise<boolean>}
+ */
+async function canBindToIp(ip) {
+  const socket = createSocket(isIPv4(ip) ? 'udp4' : 'udp6');
+  return new Promise((resolve) => {
+    try {
+      socket
+        .once('error', () => socket.close(() => resolve(false)))
+        .once('listening', () => socket.close(() => resolve(true)))
+        .unref()
+        .bind(0, ip);
+    } catch {
+      socket.close(() => resolve(false));
+    }
+  });
+}
+
+/**
+ * Checks if given strings is a local IP address or a DNS name that resolve into a local IP
+ *
+ * @param {string} ipOrHostname
+ * @param {boolean} [canBind=false] - should check whether an interface with such address exists on the local machine
  * @returns {Promise.<boolean>} - true, if given strings is a local IP address or DNS names that resolves to local IP
  */
-async function isLocalhost(ip) {
-  if (typeof ip !== 'string') return false;
+async function isLocalhost(ipOrHostname, canBind = false) {
+  if (typeof ipOrHostname !== 'string') return false;
 
   // Check if given string is an IP address
-  if (isIP(ip)) return INTERFACES_ADDRESSES.has(ip) || IP_TESTER_RE.test(ip);
+  if (isIP(ipOrHostname)) {
+    if (IP_TESTER_RE.test(ipOrHostname) && !canBind) return true;
+    return canBindToIp(ipOrHostname);
+  }
 
   // May it be a hostname?
-  if (!VALID_HOSTNAME.test(ip)) return false;
+  if (!VALID_HOSTNAME.test(ipOrHostname)) return false;
 
   // it's a DNS name
   try {
-    const addresses = await lookup(ip, LOOKUP_OPTIONS);
-    return (
-      Array.isArray(addresses) &&
-      addresses.some(
-        ({ address }) =>
-          INTERFACES_ADDRESSES.has(address) || IP_TESTER_RE.test(address),
-      )
-    );
-  } catch (_) {
-    return false;
-  }
+    const addresses = await lookup(ipOrHostname, {
+      all: true,
+      family: 0,
+      verbatim: true,
+      hints: ADDRCONFIG,
+    });
+    if (!Array.isArray(addresses)) return false;
+    for (const { address } of addresses) {
+      if (await isLocalhost(address, canBind)) return true;
+    }
+    // eslint-disable-next-line no-empty
+  } catch {}
+  return false;
 }
 
 module.exports = isLocalhost;
