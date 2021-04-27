@@ -37,7 +37,7 @@
   "homepage": "https://github.com/tinovyatkin/is-localhost-ip#readme",
   "devDependencies": {
     "@types/jest": "26.0.23",
-    "@types/node": "12.20.10",
+    "@types/node": "12.20.11",
     "eslint": "7.25.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-node": "11.1.0",
