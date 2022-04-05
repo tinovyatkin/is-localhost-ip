@@ -15,7 +15,7 @@ jobs:
       - run: node --expose-gc node_modules/jest/bin/jest --forceExit --logHeapUsage --runInBand --ci --coverage --colors
 
       - name: Upload coverage to Codecov  
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/coverage-final.json
