@@ -30,7 +30,7 @@
     "dns"
   ],
   "author": "Konstantin Vyatkin <tino@vtkn.io>",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/tinovyatkin/is-localhost-ip/issues"
   },
