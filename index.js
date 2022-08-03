@@ -3,19 +3,7 @@
 const { isIP, isIPv4 } = require('net');
 const { createSocket } = require('dgram');
 const { ADDRCONFIG } = require('dns');
-
-/*
-DNS.promises were experimental until Node 11.4 and we don't want experimental warning
-https://nodejs.org/en/blog/release/v11.14.0/
-*/
-const lookup =
-  process.versions.node
-    .split('.', 2)
-    .map((n) => n.padStart(2, '0'))
-    .join('.') >= '11.14'
-    ? // eslint-disable-next-line node/no-unsupported-features/node-builtins
-      require('dns').promises.lookup
-    : require('util').promisify(require('dns').lookup);
+const { lookup } = require('dns').promises;
 
 /**
  * Addresses reserved for private networks
@@ -49,7 +37,9 @@ const IP_TESTER_RE = new RegExp(
  * Maximum total length 253 symbols, maximum segment length 63 symbols
  * @see {@link https://en.wikipedia.org/wiki/Hostname}
  */
-const VALID_HOSTNAME = /(?![\w-]{64,})((^(?=[\w-.]{1,253}\.?$)((\w{1,63}|(\w[\w-]{0,61}\w))\.?)+$)(?<!\.{2,}))/i;
+const VALID_HOSTNAME =
+  // eslint-disable-next-line regexp/no-dupe-disjunctions
+  /(?![\w-]{64})((^(?=[-\w.]{1,253}\.?$)((\w{1,63}|(\w[-\w]{0,61}\w))\.?)+$)(?<!\.{2}))/;
 
 /**
  *

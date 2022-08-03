@@ -18,18 +18,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        node: [13.x, 12.x, 10.x]
+        node: [12.x, 14.x, 16.x]
         exclude:
           # On Windows, run tests with only the LTS environments.
           - os: windows-latest
-            node: 10.x
+            node: 12.x
           - os: windows-latest
-            node: 13.x
+            node: 14.x
           # On macOS, run tests with only the LTS environments.
           - os: macOS-latest
-            node: 10.x
+            node: 12.x
           - os: macOS-latest
-            node: 13.x
+            node: 1.x
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -41,7 +41,7 @@ jobs:
 
       - run: npm ci
 
-      - run: node --throw-deprecation --trace-warnings --expose-gc node_modules/jest/bin/jest --forceExit --colors --logHeapUsage --runInBand --ci --detectOpenHandles --detectLeaks --coverage
+      - run: node --throw-deprecation --trace-warnings --expose-gc node_modules/jest/bin/jest --forceExit --colors --logHeapUsage --runInBand --ci --detectOpenHandles --coverage
 
       - name: Upload coverage to Codecov  
         uses: codecov/codecov-action@v3
