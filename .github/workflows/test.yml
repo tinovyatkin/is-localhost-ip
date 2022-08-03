@@ -29,7 +29,7 @@ jobs:
           - os: macOS-latest
             node: 12.x
           - os: macOS-latest
-            node: 14.x
+            node: 1.x
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -41,7 +41,7 @@ jobs:
 
       - run: npm ci
 
-      - run: node --throw-deprecation --trace-warnings --expose-gc node_modules/jest/bin/jest --forceExit --colors --logHeapUsage --runInBand --ci --detectOpenHandles --detectLeaks --coverage
+      - run: node --throw-deprecation --trace-warnings --expose-gc node_modules/jest/bin/jest --forceExit --colors --logHeapUsage --runInBand --ci --detectOpenHandles --coverage
 
       - name: Upload coverage to Codecov  
         uses: codecov/codecov-action@v3
