@@ -43,7 +43,7 @@ const isLocalhost = require('is-localhost-ip');
 const punycode = require('punycode');
 
 (async () => {
-  await isLocalhost(punycode.toASCII('кремль.рф')); // false
+  await isLocalhost(punycode.toASCII('свобода.рф')); // false
   await isLocalhost(punycode.toASCII('私の.家')); // true
 })();
 ```
