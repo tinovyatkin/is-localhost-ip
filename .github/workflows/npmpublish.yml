@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
       - run: npm ci
       - run: node --expose-gc node_modules/jest/bin/jest --forceExit --logHeapUsage --runInBand --ci --coverage --colors
@@ -25,7 +25,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           registry-url: https://registry.npmjs.org/
