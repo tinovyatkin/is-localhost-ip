@@ -28,8 +28,10 @@ describe('Host names', () => {
     expect(await isLocal('google.com')).toBeFalsy());
 
   it('works with some syntactically correct, but non-existent names', async () =>
-    expect(await isLocal('definitely123.not.a.good.domain.name')).toBeFalsy());
+    await expect(
+      isLocal('definitely123.not.a.good.domain.name'),
+    ).rejects.toThrowError());
 
   it('works with some syntactically incorrect names', async () =>
-    expect(await isLocal('_a.not..domain.name')).toBeFalsy());
+    await expect(isLocal('_a.not..domain.name')).rejects.toThrowError());
 });

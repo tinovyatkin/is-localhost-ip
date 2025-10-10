@@ -55,5 +55,8 @@
     "coverageProvider": "v8",
     "testEnvironment": "node",
     "collectCoverage": true
+  },
+  "dependencies": {
+    "ipaddr.js": "^2.2.0"
   }
 }

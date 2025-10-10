@@ -1,5 +1,6 @@
 'use strict';
 
+const ipaddr = require('ipaddr.js');
 const { isIP, isIPv4 } = require('net');
 const { createSocket } = require('dgram');
 const { ADDRCONFIG } = require('dns');
@@ -22,9 +23,9 @@ const IP_RANGES = [
   // 192.168.0.0 - 192.168.255.255
   /^(:{2}f{4}:)?192\.168(?:\.\d{1,3}){2}$/,
   // fc00::/7
-  /^f[cd][\da-f]{2}(::1$|:[\da-f]{1,4}){1,7}$/,
+  /^f[cd][\da-f]{2}(::1?$|:[\da-f]{1,4}){1,7}$/,
   // fe80::/10
-  /^fe[89ab][\da-f](::1$|:[\da-f]{1,4}){1,7}$/,
+  /^fe[89ab][\da-f](::1?$|:[\da-f]{1,4}){1,7}$/,
 ];
 
 // Concat all RegExes from above into one
@@ -69,31 +70,44 @@ async function canBindToIp(ip) {
  * @returns {Promise.<boolean>} - true, if given strings is a local IP address or DNS names that resolves to local IP
  */
 async function isLocalhost(ipOrHostname, canBind = false) {
-  if (typeof ipOrHostname !== 'string') return false;
+  if (typeof ipOrHostname !== 'string') {
+    throw new Error('Invalid ip or hostname provided');
+  }
+
+  // Removes [ and ] around ipv6 hostnames
+  const normalizedIpOrHostname = ipOrHostname.replace(/^\[|\]$/g, '');
+
+  const isIp = isIP(normalizedIpOrHostname);
 
   // Check if given string is an IP address
-  if (isIP(ipOrHostname)) {
-    if (IP_TESTER_RE.test(ipOrHostname) && !canBind) return true;
-    return canBindToIp(ipOrHostname);
+  if (isIp === 4 || isIp === 6) {
+    const ip = ipaddr.process(normalizedIpOrHostname).toString();
+
+    if (IP_TESTER_RE.test(ip) && !canBind) return true;
+    return canBindToIp(ip);
   }
 
   // May it be a hostname?
-  if (!VALID_HOSTNAME.test(ipOrHostname)) return false;
+  if (!VALID_HOSTNAME.test(normalizedIpOrHostname)) {
+    throw new Error('Invalid ip or hostname provided');
+  }
 
   // it's a DNS name
-  try {
-    const addresses = await lookup(ipOrHostname, {
-      all: true,
-      family: 0,
-      verbatim: true,
-      hints: ADDRCONFIG,
-    });
-    if (!Array.isArray(addresses)) return false;
-    for (const { address } of addresses) {
-      if (await isLocalhost(address, canBind)) return true;
-    }
-    // eslint-disable-next-line no-empty
-  } catch {}
+  const addresses = await lookup(normalizedIpOrHostname, {
+    all: true,
+    family: 0,
+    verbatim: true,
+    hints: ADDRCONFIG,
+  });
+
+  if (!Array.isArray(addresses)) {
+    throw new Error('DNS Lookup failed.');
+  }
+
+  for (const { address } of addresses) {
+    if (await isLocalhost(address, canBind)) return true;
+  }
+
   return false;
 }
 

@@ -6,8 +6,9 @@ const isLocal = require('../index');
 describe('IP addresses', () => {
   // throw on process warnings
 
-  it('edge case - 0', async () => expect(await isLocal(0)).toBeFalsy());
-  it('edge case - NaN', async () => expect(await isLocal(NaN)).toBeFalsy());
+  it('edge case - 0', async () => await expect(isLocal(0)).rejects.toThrow());
+  it('edge case - NaN', async () =>
+    await expect(isLocal(NaN)).rejects.toThrow());
   it('works for ::', async () => expect(await isLocal('::1')).toBeTruthy());
   it('works for ::1', async () => expect(await isLocal('::1')).toBeTruthy());
   it('works for fe80::1', async () =>
@@ -53,6 +54,9 @@ describe('IP addresses', () => {
     expect(await isLocal('127.0.0.0')).toBeTruthy();
     expect(await isLocal('127.255.255.255')).toBeTruthy();
     expect(await isLocal('::ffff:127.255.255.255')).toBeTruthy();
+    expect(await isLocal('::ffff:7f00:1', false)).toBeTruthy();
+    expect(await isLocal('::ffff:7f00:1', true)).toBeTruthy();
+    expect(await isLocal('[::ffff:7f00:1]')).toBeTruthy();
     expect(await isLocal('128.0.0.0')).toBeFalsy();
   });
 
@@ -76,7 +80,13 @@ describe('IP addresses', () => {
     expect(await isLocal('169.254.0.0')).toBeFalsy();
     expect(await isLocal('169.254.1.0')).toBeTruthy();
     expect(await isLocal('169.254.254.255')).toBeTruthy();
+    expect(await isLocal('169.254.169.254')).toBeTruthy();
     expect(await isLocal('::ffff:169.254.254.255')).toBeTruthy();
+    expect(await isLocal('::ffff:a9fe:a9fe')).toBeTruthy();
+    expect(await isLocal('0:0:0:0:0:ffff:a9fe:a9fe')).toBeTruthy();
+    expect(
+      await isLocal('0000:0000:0000:0000:0000:ffff:a9fe:a9fe'),
+    ).toBeTruthy();
     expect(await isLocal('169.254.255.0')).toBeFalsy();
   });
 
@@ -84,6 +94,7 @@ describe('IP addresses', () => {
     expect(await isLocal('fb00::1')).toBeFalsy();
     expect(await isLocal('fc00::1')).toBeTruthy();
     expect(await isLocal('fdff::1')).toBeTruthy();
+    expect(await isLocal('fdaa::')).toBeTruthy();
     expect(
       await isLocal('fdaa:0000:0000:0000:0000:0000:0000:0000'),
     ).toBeTruthy();

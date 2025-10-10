@@ -14,10 +14,12 @@ describe('mocked dns tests', () => {
 
   it('works with empty or error responses', async () => {
     expect(await isLocalhost('test.empty')).toBeFalsy();
-    expect(await isLocalhost('test.error')).toBeFalsy();
+    await expect(isLocalhost('test.error')).rejects.toThrowError();
   });
 
   it('works on dns throws', async () => {
-    expect(await isLocalhost('our-mock-resolver-will-throw')).toBeFalsy();
+    await expect(
+      isLocalhost('our-mock-resolver-will-throw'),
+    ).rejects.toThrowError();
   });
 });
