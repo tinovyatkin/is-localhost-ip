@@ -1,35 +1,20 @@
-'use strict';
+"use strict";
 
-describe('Host names', () => {
-  /** @type {import('../index')} */
-  let isLocal;
-  beforeAll(() => {
-    process.on('unhandledRejection', (up) => {
-      throw up;
-    });
-    process.once('warning', (e) => {
-      throw e;
-    });
-    // load like here to catch any experimental warning
-    isLocal = require('../index');
-  });
-  afterAll(() => {
-    process.removeAllListeners('warning');
-    process.removeAllListeners('unhandledRejection');
-  });
+const { describe, test } = require("node:test");
+const assert = require("node:assert/strict");
 
-  // we work with DNS resolver and it can be slow on CI
-  beforeAll(() => jest.setTimeout(20000));
+const isLocal = require("../index");
 
-  it('works with `localhost`', async () =>
-    expect(await isLocal('localhost')).toBeTruthy());
+// We work with DNS resolver and it can be slow on CI
+describe("Host names", { timeout: 20000 }, () => {
+  test("works with `localhost`", async () => assert.strictEqual(await isLocal("localhost"), true));
 
-  it('works with `google.com`', async () =>
-    expect(await isLocal('google.com')).toBeFalsy());
+  test("works with `google.com`", async () =>
+    assert.strictEqual(await isLocal("google.com"), false));
 
-  it('works with some syntactically correct, but non-existent names', async () =>
-    expect(await isLocal('definitely123.not.a.good.domain.name')).toBeFalsy());
+  test("works with some syntactically correct, but non-existent names", async () =>
+    assert.strictEqual(await isLocal("definitely123.not.a.good.domain.name"), false));
 
-  it('works with some syntactically incorrect names', async () =>
-    expect(await isLocal('_a.not..domain.name')).toBeFalsy());
+  test("works with some syntactically incorrect names", async () =>
+    assert.strictEqual(await isLocal("_a.not..domain.name"), false));
 });

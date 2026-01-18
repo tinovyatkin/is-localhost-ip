@@ -5,31 +5,44 @@ on:
     branches:
       - master
 
+# Required for NPM Trusted Publishing (OIDC)
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-      - run: npm ci
-      - run: node --expose-gc node_modules/jest/bin/jest --forceExit --logHeapUsage --runInBand --ci --coverage --colors
-
-      - name: Upload coverage to Codecov  
-        uses: codecov/codecov-action@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage/coverage-final.json
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: mkdir -p coverage
+
+      - run: npm test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
+          files: ./coverage/lcov.info
           fail_ci_if_error: true
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          registry-url: https://registry.npmjs.org/
+          node-version: 24
+          cache: npm
       - run: npm ci
+      # Uses OIDC Trusted Publishing - no token needed
+      # Provenance attestation is automatically generated
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
