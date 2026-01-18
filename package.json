@@ -26,6 +26,7 @@
     "index.js"
   ],
   "main": "index.js",
+  "browser": false,
   "types": "index.d.ts",
   "scripts": {
     "test": "node --test --experimental-test-module-mocks --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info __tests__/*.test.js",
