@@ -8,6 +8,10 @@ on:
       - "__tests__/**"
       - ".github/workflows/test.yml"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test:
     name: Test
@@ -36,7 +40,6 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
-        if: matrix.os == 'ubuntu-latest'
         with:
           use_oidc: true
           files: ./coverage/lcov.info
