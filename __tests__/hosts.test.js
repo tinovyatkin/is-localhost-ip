@@ -13,7 +13,7 @@ describe("Host names", { timeout: 20000 }, () => {
     assert.strictEqual(await isLocal("google.com"), false));
 
   test("works with some syntactically correct, but non-existent names", async () =>
-    await assert.rejects(isLocal("definitely123.not.a.good.domain.name")));
+    await assert.rejects(isLocal("example.invalid")));
 
   test("works with some syntactically incorrect names", async () =>
     await assert.rejects(isLocal("_a.not..domain.name")));
