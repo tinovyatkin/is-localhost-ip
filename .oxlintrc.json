@@ -62,6 +62,7 @@
 
     "no-fallthrough": "error",
     "no-console": "error",
+    "no-await-in-loop": "off",
 
     "sort-imports": "off"
   },
@@ -69,8 +70,7 @@
     {
       "files": ["**/__tests__/**"],
       "rules": {
-        "no-console": "off",
-        "no-await-in-loop": "off"
+        "no-console": "off"
       }
     }
   ],

@@ -11,27 +11,14 @@
   "oxc.configPath": ".oxlintrc.json",
   "oxc.fixKind": "safe_fix_or_suggestion",
   "oxc.typeAware": true,
-  "oxc.fmt.experimental": true,
 
   // Use oxc as default formatter for JS/TS
-  "[typescript]": {
+  "[typescript][javascript][json][jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.codeActionsOnSave": {
       "source.fixAll.oxc": "explicit",
       "source.organizeImports": "explicit"
     }
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.oxc": "explicit"
-    }
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[markdown]": {
     "editor.unicodeHighlight.ambiguousCharacters": true,
