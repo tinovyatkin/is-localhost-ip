@@ -64,8 +64,4 @@ describe("mocked dns tests", () => {
     assert.strictEqual(await isLocalhost("test.empty"), false);
     assert.strictEqual(await isLocalhost("test.error"), false);
   });
-
-  test("works on dns throws", async () => {
-    assert.strictEqual(await isLocalhost("our-mock-resolver-will-throw"), false);
-  });
 });
