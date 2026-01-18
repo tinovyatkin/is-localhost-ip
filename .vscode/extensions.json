@@ -1,0 +1,10 @@
+{
+  "recommendations": ["oxc.oxc-vscode", "rvben.rumdl", "tekumara.typos-vscode"],
+  "unwantedRecommendations": [
+    "dbaeumer.vscode-eslint",
+    "biomejs.biome",
+    "esbenp.prettier-vscode",
+    "DavidAnson.vscode-markdownlint",
+    "unifiedjs.vscode-remark"
+  ]
+}

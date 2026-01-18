@@ -1,59 +1,46 @@
 {
   "name": "is-localhost-ip",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Checks whether given DNS name or IPv4/IPv6 address belongs to a local machine",
-  "main": "index.js",
-  "files": [
-    "index.js",
-    "index.d.ts"
+  "keywords": [
+    "check-localhost",
+    "dns",
+    "ip",
+    "is-local-ip",
+    "is-localhost",
+    "is-loopback",
+    "localhost"
   ],
-  "types": "index.d.ts",
-  "engines": {
-    "node": ">=12"
+  "homepage": "https://github.com/tinovyatkin/is-localhost-ip#readme",
+  "bugs": {
+    "url": "https://github.com/tinovyatkin/is-localhost-ip/issues"
   },
-  "scripts": {
-    "test": "jest --coverage --verbose",
-    "lint": "eslint ."
-  },
+  "license": "MIT",
+  "author": "Konstantin Vyatkin <tino@vtkn.io>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tinovyatkin/is-localhost-ip.git"
   },
-  "keywords": [
-    "localhost",
-    "is-localhost",
-    "check-localhost",
-    "is-loopback",
-    "is-local-ip",
-    "ip",
-    "dns"
+  "files": [
+    "index.d.ts",
+    "index.js"
   ],
-  "author": "Konstantin Vyatkin <tino@vtkn.io>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/tinovyatkin/is-localhost-ip/issues"
+  "main": "index.js",
+  "browser": false,
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node --test --experimental-test-module-mocks --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info __tests__/*.test.js",
+    "lint": "oxlint --fix --fix-suggestions",
+    "format": "oxfmt --write .",
+    "prepare": "lefthook install"
   },
-  "homepage": "https://github.com/tinovyatkin/is-localhost-ip#readme",
   "devDependencies": {
-    "@types/jest": "29.5.4",
-    "@types/node": "12.20.55",
-    "eslint": "8.52.0",
-    "eslint-config-prettier": "9.0.0",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-prettier": "5.0.1",
-    "eslint-plugin-regexp": "2.1.1",
-    "jest": "29.7.0",
-    "prettier": "3.0.0"
+    "@types/node": "22.15.21",
+    "lefthook": "^2.0.15",
+    "oxfmt": "^0.24.0",
+    "oxlint": "^1.39.0"
   },
-  "jest": {
-    "coverageReporters": [
-      "text",
-      "json",
-      "cobertura",
-      "lcov"
-    ],
-    "coverageProvider": "v8",
-    "testEnvironment": "node",
-    "collectCoverage": true
+  "engines": {
+    "node": ">=18"
   }
 }
