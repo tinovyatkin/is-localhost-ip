@@ -9,7 +9,7 @@ const isLocal = require("../index");
 describe("IP addresses", () => {
   test("edge case - 0", async () => assert.strictEqual(await isLocal(0), false));
   test("edge case - NaN", async () => assert.strictEqual(await isLocal(NaN), false));
-  test("works for ::", async () => assert.strictEqual(await isLocal("::1"), true));
+  test("works for ::", async () => assert.strictEqual(await isLocal("::"), true));
   test("works for ::1", async () => assert.strictEqual(await isLocal("::1"), true));
   test("works for fe80::1", async () => assert.strictEqual(await isLocal("fe80::1"), true));
 
