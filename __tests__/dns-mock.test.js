@@ -62,6 +62,6 @@ describe("mocked dns tests", () => {
 
   test("works with empty or error responses", async () => {
     assert.strictEqual(await isLocalhost("test.empty"), false);
-    assert.strictEqual(await isLocalhost("test.error"), false);
+    await assert.rejects(isLocalhost("test.error"));
   });
 });

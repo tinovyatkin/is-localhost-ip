@@ -7,9 +7,10 @@ const assert = require("node:assert/strict");
 const isLocal = require("../index");
 
 describe("IP addresses", () => {
-  test("edge case - 0", async () => assert.strictEqual(await isLocal(0), false));
-  test("edge case - NaN", async () => assert.strictEqual(await isLocal(NaN), false));
+  test("edge case - 0", async () => await assert.rejects(isLocal(0)));
+  test("edge case - NaN", async () => await assert.rejects(isLocal(NaN)));
   test("works for ::", async () => assert.strictEqual(await isLocal("::"), true));
+  test("works for bracketed [::]", async () => assert.strictEqual(await isLocal("[::]"), true));
   test("works for ::1", async () => assert.strictEqual(await isLocal("::1"), true));
   test("works for fe80::1", async () => assert.strictEqual(await isLocal("fe80::1"), true));
 
@@ -42,6 +43,7 @@ describe("IP addresses", () => {
     assert.strictEqual(await isLocal("127.0.0.0"), true);
     assert.strictEqual(await isLocal("127.255.255.255"), true);
     assert.strictEqual(await isLocal("::ffff:127.255.255.255"), true);
+    assert.strictEqual(await isLocal("[::ffff:127.255.255.255]"), true);
     assert.strictEqual(await isLocal("128.0.0.0"), false);
   });
 
@@ -65,6 +67,7 @@ describe("IP addresses", () => {
     assert.strictEqual(await isLocal("169.254.0.0"), false);
     assert.strictEqual(await isLocal("169.254.1.0"), true);
     assert.strictEqual(await isLocal("169.254.254.255"), true);
+    assert.strictEqual(await isLocal("169.254.169.254"), true);
     assert.strictEqual(await isLocal("::ffff:169.254.254.255"), true);
     assert.strictEqual(await isLocal("169.254.255.0"), false);
   });
@@ -73,6 +76,7 @@ describe("IP addresses", () => {
     assert.strictEqual(await isLocal("fb00::1"), false);
     assert.strictEqual(await isLocal("fc00::1"), true);
     assert.strictEqual(await isLocal("fdff::1"), true);
+    assert.strictEqual(await isLocal("fdaa::"), true);
     assert.strictEqual(await isLocal("fdaa:0000:0000:0000:0000:0000:0000:0000"), true);
     assert.strictEqual(await isLocal("fe00::1"), false);
   });
